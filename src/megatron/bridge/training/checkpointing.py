@@ -1447,7 +1447,6 @@ def _interleave_glu_weight(weight: torch.Tensor, interleave_size: int) -> torch.
     Output format (dim 0): [W0:31, V0:31, W32:63, V32:63, ...]
     """
     shape = weight.shape
-    dim_to_interleave = shape[0]  # First dimension is the output dimension
     
     weight = weight.reshape(
         2,                                        # W and V
