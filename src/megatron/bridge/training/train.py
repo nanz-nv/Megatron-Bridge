@@ -1428,7 +1428,7 @@ def _handle_mxfp8_param_buffer_copy(
     if reuse_grad_buf_for_mxfp8_param_ag and overlap_param_gather:
         # Check if forward_pre_hook is enabled by checking if hooks are registered.
         forward_pre_hook_enabled = len(model[0].remove_forward_pre_hook_handles) > 0
-        if forward_pre_hook_enabled:
+        if True:
             for optim_instance in optimizer.chained_optimizers:
                 if isinstance(optim_instance, DistributedOptimizer):
                     optim_instance._copy_main_params_to_param_buffer()
