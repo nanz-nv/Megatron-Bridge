@@ -171,6 +171,10 @@ class DataloaderConfig:
     num_workers: int = 2
     """Dataloader number of workers."""
 
+    prefetch_factor: int | None = None
+    """Optional ``DataLoader`` ``prefetch_factor``. When ``None``, PyTorch's default applies.
+    Only used when ``num_workers`` is greater than zero."""
+
     data_sharding: bool = True
     """Disable data sharding."""
 
@@ -191,6 +195,10 @@ class DataloaderConfig:
         """Finalize dataloader config field constraints."""
         if self.num_workers == 0 and self.persistent_workers:
             self.persistent_workers = False
+        if self.num_workers == 0 and self.prefetch_factor is not None:
+            self.prefetch_factor = None
+        if self.prefetch_factor is not None and self.prefetch_factor < 1:
+            raise ValueError(f"dataset.prefetch_factor must be >= 1 when set, got {self.prefetch_factor}")
 
 
 @dataclass(frozen=True)

@@ -25,6 +25,7 @@ def build_pretraining_data_loader(
     data_parallel_size: int = 1,
     drop_last: Optional[bool] = True,
     global_batch_size: Optional[int] = None,
+    prefetch_factor: Optional[int] = None,
 ) -> Optional[DataLoader]:
     """Build a dataloader for pretraining.
 
@@ -49,6 +50,8 @@ def build_pretraining_data_loader(
         drop_last: Whether to drop last incomplete batch.
         global_batch_size: Total batch size across all data parallel ranks.
                           Required for 'batch' dataloader_type.
+        prefetch_factor: Optional ``DataLoader`` prefetch count; only passed when
+            ``num_workers > 0``. ``None`` uses PyTorch's default.
 
     Returns:
         A PyTorch DataLoader instance, or the dataset itself if dataloader_type is
@@ -106,6 +109,10 @@ def build_pretraining_data_loader(
         raise Exception("{} dataloader type is not supported.".format(dataloader_type))
 
     # Torch dataloader.
+    extra_dl_kwargs: dict[str, int] = {}
+    if num_workers > 0 and prefetch_factor is not None:
+        extra_dl_kwargs["prefetch_factor"] = prefetch_factor
+
     return DataLoader(
         dataset,
         batch_sampler=batch_sampler,
@@ -114,6 +121,7 @@ def build_pretraining_data_loader(
         collate_fn=collate_fn,
         persistent_workers=persistent_workers,
         worker_init_fn=worker_init_fn,
+        **extra_dl_kwargs,
     )
 
 
